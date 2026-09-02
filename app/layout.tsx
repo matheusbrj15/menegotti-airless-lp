@@ -11,6 +11,11 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/',
   },
+  icons: {
+    icon: '/brand/vitrine-mix-logo-card.png',
+    shortcut: '/brand/vitrine-mix-logo-card.png',
+    apple: '/brand/vitrine-mix-logo-card.png',
+  },
   openGraph: {
     type: 'website',
     locale: 'pt_BR',

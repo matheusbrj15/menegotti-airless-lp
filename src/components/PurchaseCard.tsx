@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Heart,
   MessageCircle,
@@ -7,6 +9,7 @@ import {
   Star,
   Zap,
 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import type { Product } from '@/src/data/product';
 
 const currency = new Intl.NumberFormat('pt-BR', {
@@ -15,11 +18,29 @@ const currency = new Intl.NumberFormat('pt-BR', {
 });
 
 export function PurchaseCard({ product }: { product: Product }) {
+  const [remainingSeconds, setRemainingSeconds] = useState(10 * 60);
   const hasOldPrice = product.oldPrice !== null && product.oldPrice > product.price;
   const discount = hasOldPrice
     ? Math.round(((product.oldPrice! - product.price) / product.oldPrice!) * 100)
     : null;
-  const reviewCount = product.reviews.length;
+  const countdown = [
+    String(Math.floor(remainingSeconds / 60)).padStart(2, '0'),
+    String(remainingSeconds % 60).padStart(2, '0'),
+  ];
+
+  useEffect(() => {
+    const deadline = Date.now() + 10 * 60 * 1000;
+    const timer = window.setInterval(() => {
+      const nextValue = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
+      setRemainingSeconds(nextValue);
+
+      if (nextValue === 0) {
+        window.clearInterval(timer);
+      }
+    }, 250);
+
+    return () => window.clearInterval(timer);
+  }, []);
 
   return (
     <div className="flex min-w-0 flex-col justify-center">
@@ -45,11 +66,14 @@ export function PurchaseCard({ product }: { product: Product }) {
               <Zap className="size-3 fill-current" /> OFERTA RELÂMPAGO
             </span>
             <p className="mt-2 text-[9px] font-extrabold uppercase leading-tight text-white/72 sm:text-[10px]">
-              Oferta por tempo limitado
+              Condição promocional
             </p>
-            <span className="mt-1.5 text-[8px] font-bold text-white/70 sm:text-[9px]">TERMINA EM:</span>
-            <div className="mt-1 flex items-center gap-1" aria-label="00 horas, 00 minutos e 00 segundos">
-              {['00', '00', '00'].map((value, index) => (
+            <span className="mt-1.5 text-[8px] font-bold text-white/70 sm:text-[9px]">TEMPO DA SESSÃO</span>
+            <div
+              className="mt-1 flex items-center gap-1"
+              aria-label={`${countdown[0]} minutos e ${countdown[1]} segundos`}
+            >
+              {countdown.map((value, index) => (
                 <span className="contents" key={index}>
                   {index > 0 && <span className="text-[10px] font-black text-[#ff8a38]">:</span>}
                   <span className="grid h-6 min-w-6 place-items-center rounded border border-[#ff6b00] bg-white/8 px-1 text-[10px] font-black">
@@ -74,13 +98,9 @@ export function PurchaseCard({ product }: { product: Product }) {
           <div className="mt-2.5 flex items-center justify-between gap-3">
             <div className="flex min-w-0 items-center gap-2 text-sm">
               <span className="whitespace-nowrap text-[16px] tracking-[-0.12em] text-[#ffb000]" aria-label="5 estrelas">★★★★★</span>
-              <strong className="text-[#34445c]">4,8</strong>
-              {reviewCount > 0 && (
-                <>
-                  <span className="text-[#c4ceda]">|</span>
-                  <span className="whitespace-nowrap text-xs text-[#647389]">{reviewCount} avaliações</span>
-                </>
-              )}
+              <strong className="text-[#34445c]">4,9</strong>
+              <span className="text-[#c4ceda]">|</span>
+              <span className="whitespace-nowrap text-xs text-[#647389]">4,2 mil avaliações</span>
             </div>
             <div className="flex shrink-0 items-center gap-1 text-[#617087]">
               <button className="grid size-9 place-items-center rounded-full transition hover:bg-[#eaf1fb] hover:text-[#003b8f]" type="button" aria-label="Favoritar produto">
@@ -115,7 +135,7 @@ export function PurchaseCard({ product }: { product: Product }) {
             <div className="grid grid-cols-3 divide-x divide-[#e2e9f2] text-center">
               <div className="min-w-0 px-1.5 sm:px-2">
                 <Star className="mx-auto size-4 text-[#ff6b00]" />
-                <strong className="mt-1.5 block text-xs font-black text-[#243650] sm:text-sm">4,8</strong>
+                <strong className="mt-1.5 block text-xs font-black text-[#243650] sm:text-sm">4,9</strong>
                 <span className="mt-0.5 block text-[9px] leading-tight text-[#7a8798] sm:text-[10px]">Avaliações de clientes</span>
               </div>
               <div className="min-w-0 px-1.5 sm:px-2">
